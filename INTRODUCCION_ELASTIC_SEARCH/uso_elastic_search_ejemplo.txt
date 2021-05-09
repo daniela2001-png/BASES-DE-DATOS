@@ -1,0 +1,22 @@
+Pregunta => no entiendo la finalidad del curso ? podrias explicar estimado profesor ???
+
+Respuesta => 
+Hola! la idea es que entiendas los conceptos de Elasticsearch. Es un ecosistema un tanto distinto de otro tipo de herramientas de almacenamiento y consulta (una DB relacional o NoSQL).
+
+También es importante que al final del curso entiendas de que manera te puedes beneficiar del uso de esta herramienta, para que la puedas integrar en tus proyectos! Te explico con un ejemplo:
+
+Tienes toda la información de tu app de pedidos online (tipo Rappi) almacenada en una base de datos relacional, pero has notado que las consultas para obtener el listado de los restaurantes está tomando cierto tiempo (más de 3 segundos) dado que la DB está haciendo varios JOINs para obtener la data.
+
+Entonces decides migrar los datos que necesita tu app para mostrar el listado (nombre de restaurante, dirección, costo de domicilio, categoría, etc) a Elastic. Con este movimiento ganas lo siguiente:
+
+La base de datos se libera de esas miles de consultas que le hacen para obtener esos datos (probablemente con JOINs incluidos)
+
+La diferencia en velocidad es grande, ya que elastic optimiza el guardado de tal manera que las búsquedas sean rapidísimas.
+
+Tu app funcionará mucho más rápido y escalará mejor en horas pico cuando hay más demanda de usuarios.
+
+En este ejemplo aislaste un caso de uso en el cual Elastic te puede ayudar a mejorar las búsquedas en tu app, las cuales son las que en muchos casos requieren consultas pesadas.
+
+Las bases de datos relacionales y elasticsearch son muy distintas en sus propósitos y ambas son excelentes para lo que fueron construidas. Tienen en común que guardan y obtienen datos, pero el caso de uso es distinto.
+
+Saludos!
