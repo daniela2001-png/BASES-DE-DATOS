@@ -1,0 +1,679 @@
+{
+	"info": {
+		"_postman_id": "acbce846-4e2d-4e95-b8fc-25dff2497b90",
+		"name": "INTRODUCCION-ELASTIC-SEARCH",
+		"description": "Dentro de este directorio haremos peticiones usando elastic search a un container de docker donde tenemos un cluster con 3 nodos :D ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "MAPEO-DE-DATOS-ES",
+			"item": [
+				{
+					"name": "PUT AÑADIR UN NUEVO CAMPO AL INDICE DE RESTAURANTE YA CREADO",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"properties\": {\n        \"estado\": {\"type\":\"keyword\"}\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v2/_mapping",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v2",
+								"_mapping"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT CREAR NUESTRO 1ER DOCUMENTO CON EL INDICE YA CREADO",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre_plato1\":\"burro taco especial\",\n    \"descripcion1\":\"un taco grande con pepinillos carne y verduras con mucha salsa\",\n    \"estado1\": \"activo\",\n    \"#pedidosUltimaHora1\": 1000,\n    \"ultima_modificacion_plato1\": {\n        \"usuario1\":\"Andres Figueroa\",\n        \"fecha1\":\"2021-05-25\"\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v2/_doc/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v2",
+								"_doc",
+								"1"
+							]
+						},
+						"description": "usaremos el metodo http PUT para crear nuestro 1er documento en el indice de resturantes con todos los campos ya preestablecidos y sus tipos de datos asigandos a cada campo del type del indice restaurantes"
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:9200/restaurante",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"source\": {\n        \"index\":\"restaurante\"\n    },\n    \"dest\": {\n        \"index\":\"restaurante_v3\"\n    },\n    \"script\": {\n        \"source\":\"\"\n    }\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante/_reindex",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante",
+								"_reindex"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREANDO UN MAPPING",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \"mappings\": {\n            \"properties\": {\n                \"#pedidosUltimaHora1\": {\n                    \"type\": \"integer\"\n                },\n                \"descripcion1\": {\n                    \"type\": \"text\"\n                },\n                \"estado1\": {\n                    \"type\": \"keyword\"\n                },\n                \"ultima_modificacion_plato1\": {\n                    \"properties\": {\n                        \"fecha\": {\n                            \"type\": \"date\"\n                        },\n                        \"usuario\": {\n                            \"type\": \"text\"\n                        }\n                    }\n                },\n                \"nombre_plato1\": {\n                    \"type\": \"text\"\n                }\n            }\n    }\n} \n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET USANDO BUSQUEDAS POR PUNTAJE EN ELASTIC SEARCH",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": {\n        // con el campo fields como lista asignamos el peso (aumentar el _score) de un campo por la palabra buscada\n        \"simple_query_string\": {\"query\": \"platos con caviar\", \"fields\": [\"nombre_plato1\", \"descripcion1^2\"]}\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v2/_search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v2",
+								"_search"
+							]
+						},
+						"description": "haremos uso de las busqueda por querys de etexto dentro de un body JSON, cada vez que hagamos un get"
+					},
+					"response": []
+				},
+				{
+					"name": "GET BUSCAR USANDO FILTROS BOOLEANOS CON ES",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": {\n        \"bool\":{\n            \"must\": {\n                \"match\": {\"descripcion1\": \"caviar\"}\n            },\n            \"filter\": {\n                \"term\": {\"estado1\": \"activo\"}\n            },\n            \"must_not\": {\n                \"term\": {\"#pedidosUltimaHora1\": 0}\n            },\n            // acuerdate que funciona como un OR\n            \"should\": [\n                {\"match\" : {\"descripcion1\":\"pechuga\"}},\n                {\"match\" : {\"descripcion1\":\"carbon\"}},\n                {\"match\" : {\"descripcion1\":\"chedar\"}}\n            ],\n            \"minimum_should_match\": 1\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v2/_search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v2",
+								"_search"
+							]
+						},
+						"description": "USAREMOS LOS FILTROS BOOL:\n- FILTER => NO AFECTA EL SCORE Y SE ALMACENA EN CACHE FUNCIONA COMO UN AND LOGICO\n- SHOULD => AFECTA EL SCORE Y FUNCIONA COMO UN OR LOGICO\n- MUST => AFECTA EL SCORE Y FUNCIONA COMO UN AND LOGICO\n- MUST_NOT => IGNORA EL SCORE Y NO APARECE EN EL MATCH DE BUSQUEDA EN LOS DOCUMENTOS FUNCIONA COMO UN NOT LOGICO Y SE ALMACENA EN CACHÉ\n"
+					},
+					"response": []
+				},
+				{
+					"name": "GET  BUSQUEDAS COMPUESTAS BOOL",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": {\n        \"bool\": {\n            \"must\": [\n                {\n                    \"bool\": {\n                        \"should\": [\n                            {\n                                \"term\": {\n                                    \"estado1\": \"activo\"\n                                }\n                            },\n                            {\n                                \"term\": {\n                                    \"estado1\": \"inactivo\"\n                                }\n                            }\n                        ]\n                    }\n                },\n                {\n                    \"bool\": {\n                        \"should\": [\n                            {\n                                \"match\": {\"ultima_modificacion_plato1.usuario1\": \"Diana Morales\"}\n                            },\n                            {\n                                \"match\": {\"ultima_modificacion_plato1.usuario1\": \"Andres Figueroa\"}\n                            }\n                        ]\n                    }\n                },\n                {\"range\": {\"#pedidosUltimaHora1\": {\"gt\": 250}}}\n            ]\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v2/_search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v2",
+								"_search"
+							]
+						},
+						"description": "\n"
+					},
+					"response": []
+				},
+				{
+					"name": "POST ELIMINAR DUPLICADOS POR REINDEX",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Este folder se encargará de crear un indice(db) haciendo uso del mapeo de datos es decir definir que campos tendra un type y que tipos de datos tendran esos campos de ese type, también el mapeo está destinado a definir la estructura y los tipos de campo según sea necesario\n    - Existen dos tipos de mapeo:\n        1) estatico\n        2) dinamico\n\nEjemplo de mapeo en elastic search:\n{\n  \"verbs\" : {\n    \"mappings\" : {\n      \"properties\" : {\n        },\n        \"go\" : {\n          \"type\" : \"text\"\n        },\n        \"walk\" : {\n          \"type\" : \"text\"\n        }\n      }\n    }\n  }\n}\n\ndefinimos el type_name => \"verbs\" y tendra dos campos => \"go\" y \"walk\" que seran de tipo \"text\"\n\n"
+		},
+		{
+			"name": "INTRO A ES HACIENDO REQUESTS BASICOS",
+			"item": [
+				{
+					"name": "PUT CREAR UN DOCUMENTO CON ELASTIC SEARCH",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombres\":\"Valentina\",\n    \"apellidos\": \"Morales\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/usuarios/_doc/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"usuarios",
+								"_doc",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET OBTENER TODOS LOS USUARIOS",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}_search",
+							"host": [
+								"{{URL}}_search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST ACTUALIZAR UN DOC ATRAVES DE UN POST",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"doc\" : {\n        \"edad\": 19\n    }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}_update/1",
+							"host": [
+								"{{URL}}_update"
+							],
+							"path": [
+								"1"
+							]
+						},
+						"description": "usaremos la accion de elastic-search _update y su _id para actualizar ese documento con ese _id"
+					},
+					"response": []
+				},
+				{
+					"name": "POST CREAR MULTIPLES DOCS EN UN MISMO REQUEST",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html\n{ \"index\" : { \"_index\" : \"usuarios\", \"_id\" : \"3\" }}\n{ \"nombres\" : \"valeria\", \"apellidos\":\"mora\"}\n{ \"index\" : { \"_index\" : \"usuarios\", \"_id\" : \"4\" }}\n{ \"nombres\" : \"valetas\", \"apellidos\":\"morron\"}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}_bulk",
+							"host": [
+								"{{URL}}_bulk"
+							]
+						},
+						"description": "usaremos la accion _bulk que ofrece la API de Elastic Search para indexar multiples documentos en un mismo llamado"
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE ELIMINAR UN DOCUMENTO Y UN INDEX COMPLETO TAMBIEN",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9200/delete-users/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"delete-users",
+								""
+							]
+						},
+						"description": "en este verbo http DELETE eliminaremos 1ro el doucmento es decir la fila y luego la base de datos entera\nlo comprobaremos haciendo un GET a ese index(db) para este caso crearemos un index de prueba y no afectar el original :D"
+					},
+					"response": []
+				}
+			],
+			"description": "en este folder hacemos CRUD  de la data en nuestros nodos"
+		},
+		{
+			"name": "CONSULTAS ANIDADAS",
+			"item": [
+				{
+					"name": "PUT CREAR EL INDICE DE MANERA ANIDADA",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mappings\":{\n    \"properties\":{\n      \"nombre\":{ \"type\":\"text\" },\n      \"categorias\" : {\n        \"type\" : \"nested\",\n        \"properties\": {\n          \"nombre_categoria\": { \"type\" : \"keyword\" },\n          \"es_principal\": { \"type\" : \"boolean\" }\n        }\n      }\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT CREANDO DOCUMENTOS (indice => restaurante_v3)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"MexiTaco\",\n  \"categorias\": [\n    { \"nombre\": \"Comida Rápida\", \"principal\": true },\n    { \"nombre\": \"Tacos Mexicanos\", \"principal\": true },\n    { \"nombre\": \"Desayunos\", \"principal\": false },\n    { \"nombre\": \"Hamburguesas\", \"principal\": false }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v3/_doc/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v3",
+								"_doc",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET miramos los documentos del indice",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": {\n    \"nested\": {\n      \"path\": \"categorias\",\n      \"query\": {\n        \"bool\": {\n          \"must\": [\n              {\"match\": { \"categorias.nombre\": \"Comida rápida\" }},\n              {\"match\": { \"categorias.principal\": true }}\n          ]\n        }\n      }\n    }\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v3/_search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v3",
+								"_search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET OBTNER EL MAPEO DE RESTURANTES V3",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v2/_mapping",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v2",
+								"_mapping"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "En este modulo aprenderé a hacer consultas anidadas con elastic search "
+		},
+		{
+			"name": "UNIFICACIONDE DATOS",
+			"item": [
+				{
+					"name": "PUT CREAR LA UNION ATRAVES DE UN UPDATE Y EL ID YA CREADO DEL RESTAURANTE",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"properties\": {\n        \"calificacion\": {\n            \"type\": \"double\"\n        },\n        \"direccion\": {\n            \"type\": \"text\"\n        },\n        \"platos\": {\n            \"type\": \"nested\",\n            \"properties\": {\n                \"#pedidosUltimaHora1\": {\n                    \"type\": \"integer\"\n                },\n                \"descripcion1\": {\n                    \"type\": \"text\"\n                },\n                \"estado1\": {\n                    \"type\": \"keyword\"\n                },\n                \"nombre_plato1\": {\n                    \"type\": \"text\"\n                }\n            }\n        },\n        \"ultima_modificacion_plato1\": {\n            \"properties\": {\n                \"fecha1\": {\n                    \"type\": \"date\"\n                },\n                \"usuario1\": {\n                    \"type\": \"text\"\n                }\n            }\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v3/_mapping",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v3",
+								"_mapping"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "http://localhost:9200/restaurante_v2/_search",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v2/_source/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v2",
+								"_source",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST PARA ACTUALIZA LOS DOCUMENTOS YA CREADOS",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"doc\": {\n        \"direccion\": \"Ciudad de México\",\n        \"platos\": [\n            {\n                \"nombre_plato1\": \"burro taco especial\",\n                \"descripcion1\": \"un taco grande con pepinillos carne y verduras con mucha salsa\",\n                \"estado1\": \"activo\",\n                \"#pedidosUltimaHora1\": 1000\n            }\n        ],\n        \"ultima_modificacion_plato1\": {\n            \"usuario1\": \"Andres Figueroa\",\n            \"fecha1\": \"2021-05-25\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v3/_update/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v3",
+								"_update",
+								"4"
+							]
+						},
+						"description": "Haremos un _update a traves de un POST para actualizar los datos de los documentos del indice resturante_v3 (son los restaurantes), con los nuevos datos que hizimos en el mapeo con la unificacion de datos entre resturantes_v2(platos) y resturante_v3 (restaurantes) para que todo unificado en un indice :D"
+					},
+					"response": []
+				}
+			],
+			"description": "HAREMOS UN MERGE ENTRE LOS INDICES resturante_v3(restaurantes como tal XD) y restaurantes (platos)"
+		},
+		{
+			"name": "Consultas de rango y agregaciones",
+			"item": [
+				{
+					"name": "GET _search CONSULTA DE RANGO DE CALIFICACIONES DE UN RESTAURANTE",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    // con la keyword _source le idremos excatly que campos queremos buscar dentro de nuestro query de respuesta\n    \"_source\": [\"nombre\", \"calificacion\", \"ultima_modificacion_plato1.fecha1\"],\n    // hacemos el query con el rango fijo de las calificaciones de un restaurante\n    \"query\": {\n        \"bool\":{\n            \"must\": [\n                {\n                    \"range\": {\n                        \"calificacion\": {\"gt\": 2.0, \"lte\": 6.0}\n                    }\n                },\n                {\n                    \"range\": {\n                        \"ultima_modificacion_plato1.fecha1\": {\"gt\": \"2018-01-01\", \"lte\": \"2020-12-31\"}\n                    }\n                }\n            ]\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v3/_search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v3",
+								"_search"
+							]
+						},
+						"description": "con el uso de range buscaremos un rango fijo de calificaciones de un restaurante haciendo uso de operadores como :\n- gt || gte\n- lt || lte"
+					},
+					"response": []
+				},
+				{
+					"name": "GET BUSQUEDA USANDO AGREGACIONES EN ELASTIC SEARCH",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    // este comando permitira ver solo el resultado de los calculos que hagamos sobte todos los documentos mas no los documentos !\n    \"size\": 0,\n    \"aggs\": {\n        \"calificacionPromedio\": {\n            \"avg\": {\n                \"field\": \"calificacion\",\n                // la key missing le dara el valor por defecto de 2.0 a los restaurantes que no tengan una calificacion definida\n                \"missing\": 8.0\n            }\n        },\n        \"calificacionMasAlta\": {\n            \"max\": {\n                \"field\": \"calificacion\"\n            }\n        },\n        \"calificacionMasBaja\": {\n            \"min\": {\n                \"field\": \"calificacion\"\n            }\n        }\n   }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v3/_search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v3",
+								"_search"
+							]
+						},
+						"description": "Las agregaciones en elastic serach nos permiten hacer calculos y estadisticas dentro de nuestros querys acerca de nuestros dterminados campos sobre quienes queremos sacar estadisticas de ellos"
+					},
+					"response": []
+				},
+				{
+					"name": "GET BUSQUEDA BOOLEANA FINAL REVISION DEL DIRECTORIO RESTAURANTES_V3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": {\n        \"bool\": {\n            \"must\": [\n                {\n                    \"bool\": {\n                        \"should\": [\n                            {\n                                \"match\": {\n                                    \"direccion\": \"Carrera 30\"\n                                }\n                            },\n                            {\n                                \"term\": {\n                                    \"direccion\": \"Calle 52A\"\n                                }\n                            }\n                        ]\n                    }\n                },\n                {\n                    \"bool\": {\n                        \"should\": [\n                            {\n                                \"nested\": {\n                                    \"path\": \"categorias\",\n                                    \"query\":{\n                                        \"bool\":{\n                                            \"must\": [\n                                                {\"match\": {\"categorias.nombre\": \"Comida Rápida\"}},\n                                                {\"match\": {\"categorias.principal\": true}}\n                                            ]\n                                        }\n                                    }\n                                }\n                            },\n                            {\n                                \"nested\": {\n                                    \"path\": \"platos\",\n                                    \"query\": {\n                                        \"bool\": {\n                                            \"must\": {\n                                                \"match\": {\"descripcion1\": \"chedar\"}\n                                            }\n                                        }\n                                    }\n                                }\n                            }\n                        ]\n                    }\n                }\n            ]\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9200/restaurante_v3/_search",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9200",
+							"path": [
+								"restaurante_v3",
+								"_search"
+							]
+						},
+						"description": "En este final query tipo bool haremos una busqueda bajo unos items de busqueda dado por el profesor"
+					},
+					"response": []
+				}
+			],
+			"description": "En este modulo aprenderemos sobre hacer consultas haciendo uso de rangos y agregaciones en Elastic Search"
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": " http://localhost:9200/usuarios/"
+		}
+	]
+}
