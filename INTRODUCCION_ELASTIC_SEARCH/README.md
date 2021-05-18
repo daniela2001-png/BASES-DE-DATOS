@@ -13,6 +13,7 @@ los esquemas son el mapeo de datos es decir le asigna un tipo a cada campo dentr
 	- **type** : my_type => tabla de datos (**en SQL**)
 	- **documento** : unidad miníma de info => fila dentro de un tabla de datos (**en SQL**)
 
+
 <img src="https://i.ibb.co/B6hf1pv/ELASTIC-SEARCH.png" alt="ELASTIC-SEARCH" border="0">
 
 
